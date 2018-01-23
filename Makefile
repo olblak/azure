@@ -25,6 +25,9 @@ generate:
 deploy: check init refresh
 	$(TERRAFORM) apply -var-file=$(VARFILE) -auto-approve=true plans
 
+destroy:
+	$(TERRAFORM) destroy -var-file=$(VARFILE) plans
+
 init: prepare generate
 	$(TERRAFORM) init \
 		-backend-config="storage_account_name=$(TF_VAR_PREFIX)tfstate" \
@@ -52,5 +55,5 @@ prepare:
 		cp plans/$$file.tf $(TFSTATE_PREPARE_DIR); \
 	done;
 	cd $(TFSTATE_PREPARE_DIR) && ../$(TERRAFORM) init &&  ../$(TERRAFORM) apply -var-file=$(VARFILE) -auto-approve=true
-	sleep 90
+	sleep 20
 
