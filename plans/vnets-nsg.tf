@@ -1,4 +1,5 @@
 #
+
 # This terraform plan defines the resources necessary to provision the Network
 # Security Groups for all our Virtual Networks (defined in vnets.tf)
 
@@ -73,6 +74,34 @@ resource "azurerm_network_security_rule" "public-app-tier-allow-ldaps-inbound" {
   source_port_range           = "636"
   destination_port_range      = "*"
   source_address_prefix       = "*"
+  destination_address_prefix  = "*"
+  resource_group_name         = "${azurerm_resource_group.public_prod.name}"
+  network_security_group_name = "${azurerm_network_security_group.public_app_tier.name}"
+}
+
+resource "azurerm_network_security_rule" "public-app-tier-allow-azureloadbalancer-inbound" {
+  name                        = "allow-azureloadbalancer-inbound"
+  priority                    = 3900
+  direction                   = "inbound"
+  access                      = "allow"
+  protocol                    = "*"
+  source_port_range           = "*"
+  destination_port_range      = "*"
+  source_address_prefix       = "AzureLoadBalancer"
+  destination_address_prefix  = "*"
+  resource_group_name         = "${azurerm_resource_group.public_prod.name}"
+  network_security_group_name = "${azurerm_network_security_group.public_app_tier.name}"
+}
+
+resource "azurerm_network_security_rule" "public-app-tier-allow-azurevirtualnetwork-inbound" {
+  name                        = "allow-azurevirtualnetwork-inbound"
+  priority                    = 3901
+  direction                   = "inbound"
+  access                      = "allow"
+  protocol                    = "*"
+  source_port_range           = "*"
+  destination_port_range      = "*"
+  source_address_prefix       = "AzureLoadBalancer"
   destination_address_prefix  = "*"
   resource_group_name         = "${azurerm_resource_group.public_prod.name}"
   network_security_group_name = "${azurerm_network_security_group.public_app_tier.name}"
@@ -252,6 +281,20 @@ resource "azurerm_network_security_rule" "private-mgmt-tier-allow-puppet-inbound
   source_port_range           = "${var.puppet_master_port}"
   destination_port_range      = "*"
   source_address_prefix       = "*"
+  destination_address_prefix  = "*"
+  resource_group_name         = "${azurerm_resource_group.private_prod.name}"
+  network_security_group_name = "${azurerm_network_security_group.private_mgmt_tier.name}"
+}
+
+resource "azurerm_network_security_rule" "private-mgmt-tier--allow-azureloadbalancer-inbound" {
+  name                        = "allow-azureloadbalancer-inbound"
+  priority                    = 400
+  direction                   = "inbound"
+  access                      = "allow"
+  protocol                    = "*"
+  source_port_range           = "*"
+  destination_port_range      = "*"
+  source_address_prefix       = "AzureLoadBalancer"
   destination_address_prefix  = "*"
   resource_group_name         = "${azurerm_resource_group.private_prod.name}"
   network_security_group_name = "${azurerm_network_security_group.private_mgmt_tier.name}"
